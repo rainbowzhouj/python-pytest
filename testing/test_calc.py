@@ -6,19 +6,15 @@ import yaml
 from pythoncode.calculator import Calculator
 
 
+# 解析测试数据文件
 def get_datas():
-    with open("./datas/caic.yml", encoding='utf-8')as f:
+    with open("./datas/calc.yml", encoding='utf-8')as f:
         datas = yaml.safe_load(f)
     add_datas = datas['add']['datas']
     add_ids = datas['add']['ids']
     print(add_datas)
     print(add_ids)
     return [add_datas, add_ids]
-
-
-def test_a():
-    print("test case a")
-
 
 # 解析测试步骤文件
 def steps(addstepsfile, calc, a, b, expect):
@@ -42,6 +38,12 @@ class TestCalc:
     def teardown_class(self):
         print("计算结束")
 
+    def test_add_steps(self):
+        a = 1
+        b = 1
+        expect = 2
+        steps("./steps/add_steps.yml", self.calc, a, b, expect)
+
     @pytest.mark.parametrize('a,b,expect', get_datas()[0],
                              ids=get_datas()[1])
     def test_add(self, a, b, expect):
@@ -51,37 +53,16 @@ class TestCalc:
             result = self.calc.add(a, b)
             assert result == expect
 
-    @pytest.mark.parametrize('a,b,expect', [
-        [0.1, 0.1, 0.2], [0.1, 0.2, 0.3]
-    ])
-    def test_add_float(self, a, b, expect):
-        result = self.calc.add(a, b)
-        assert round(result, 2) == expect
+    # @pytest.mark.parametrize('a,b,expect', [
+    #     [0.1, 0.1, 0.2], [0.1, 0.2, 0.3]
+    # ])
+    # def test_add_float(self, a, b, expect):
+    #     result = self.calc.add(a, b)
+    #     assert round(result, 2) == expect
 
-    # # 整型
-    #     def test_add(self):
-    #         #calc = Calculator()
-    #         result = self.calc.add(1, 1)
-    #         assert result == 2
-    # # 长整型
-    #     def test_add1(self):
-    #         #calc = Calculator()
-    #         result = self.calc.add(100, 100)
-    #         assert result == 200
-    #
-    # # 浮点型
-    #         def test_add2(self):
-    #             #calc = Calculator()
-    #             result = self.calc.add(0.1, 0.1)
-    #             assert result == 0.2
-    def test_add_steps(self):
-        a = 1
-        b = 1
-        expect = 2
-        steps("./steps/add_steps.yml", self.calc, a, b, expect)
-        # assert 2 ==self.calc.add(1,1)
-        # assert 3 ==self.calc.add1(1,2)
-        # assert 0 ==self.calc.add(-1,1)
+    # assert 2 ==self.calc.add(1,1)
+    # assert 3 ==self.calc.add1(1,2)
+    # assert 0 ==self.calc.add(-1,1)
 
     def test_sub(self):
         calc = Calculator()
