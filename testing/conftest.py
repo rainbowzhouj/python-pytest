@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from typing import List
 import pytest
 import yaml
 from pythoncode.calculator import Calculator
@@ -14,6 +15,7 @@ def login(request):
     print('teardown')
 
 
+
 # @pytest.fixture(scope='session', autouse=True)
 # def conn_db():
 #     print("完成 数据库连接")
@@ -23,7 +25,7 @@ def login(request):
 
 @pytest.fixture(scope='module')
 def get_calc():
-    print("计算开始")
+    print("开始计算")
     calc = Calculator()
     yield calc
     print("计算结束")
