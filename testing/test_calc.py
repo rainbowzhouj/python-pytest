@@ -1,12 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import pytest
+import yaml
 
 from pythoncode.calculator import Calculator
 
 
+def get_datas():
+    with open("./datas/caic.yml", encoding='utf-8')as f:
+        datas = yaml.safe_load(f)
+    add_datas = datas['add']['datas']
+    add_ids = datas['add']['ids']
+    print(add_datas)
+    print(add_ids)
+    return [add_datas, add_ids]
+
+
 def test_a():
     print("test case a")
+
+
+# 解析测试步骤文件
+def steps(addstepsfile, calc, a, b, expect):
+    with open(addstepsfile)as f:
+        steps = yaml.safe_load(f)
+        for step in steps:
+            if 'add' == step:
+                print("step:add")
+                result = calc.add(a, b)
+            elif 'add1' == step:
+                print("step:add1")
+                result = calc.add1(a, b)
+            assert expect == result
 
 
 class TestCalc:
@@ -17,15 +42,21 @@ class TestCalc:
     def teardown_class(self):
         print("计算结束")
 
-    @pytest.mark.parametrize('a,b,expect', [[1, 1, 2], [100, 100, 200], [0.1, 0.1, 0.2], [-1, -1, -2], [1, 0, 1],
-                                            ['he', 'llo', 'python']],
-                             ids=['int_case', 'bignum_case', 'float_case', 'minus_case', 'zero_case', 'str_case'])
+    @pytest.mark.parametrize('a,b,expect', get_datas()[0],
+                             ids=get_datas()[1])
     def test_add(self, a, b, expect):
         if a & b is str:
             print("参数类型应为数值类型")
         else:
             result = self.calc.add(a, b)
             assert result == expect
+
+    @pytest.mark.parametrize('a,b,expect', [
+        [0.1, 0.1, 0.2], [0.1, 0.2, 0.3]
+    ])
+    def test_add_float(self, a, b, expect):
+        result = self.calc.add(a, b)
+        assert round(result, 2) == expect
 
     # # 整型
     #     def test_add(self):
@@ -43,6 +74,14 @@ class TestCalc:
     #             #calc = Calculator()
     #             result = self.calc.add(0.1, 0.1)
     #             assert result == 0.2
+    def test_add_steps(self):
+        a = 1
+        b = 1
+        expect = 2
+        steps("./steps/add_steps.yml", self.calc, a, b, expect)
+        # assert 2 ==self.calc.add(1,1)
+        # assert 3 ==self.calc.add1(1,2)
+        # assert 0 ==self.calc.add(-1,1)
 
     def test_sub(self):
         calc = Calculator()
@@ -63,5 +102,10 @@ class TestCalc:
         else:
             result = self.calc.div(a, b)
             assert result == expect
-if __name__ == '__main__':
-    pytest.main(['test_calc.py', '-v'])
+
+    # @pytest.mark.parametrize('a,b,expect', [
+    #     [0.1, 0], [10, 0]
+    # ])
+    # def test_div_zero(self, a, b):
+    #     with pytest.raises(ZeroDivisionError):
+    #         self.calc.div(a, b)
